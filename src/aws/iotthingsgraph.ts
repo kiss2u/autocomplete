@@ -1,7 +1,7 @@
 const completionSpec: Fig.Spec = {
   name: "iotthingsgraph",
   description:
-    "AWS IoT Things Graph AWS IoT Things Graph provides an integrated set of tools that enable developers to connect devices and services that use different standards, such as units of measure and communication protocols. AWS IoT Things Graph makes it possible to build IoT applications with little to no code by connecting devices and services and defining how they interact at an abstract level. For more information about how AWS IoT Things Graph works, see the User Guide",
+    "AWS IoT Things Graph AWS IoT Things Graph provides an integrated set of tools that enable developers to connect devices and services that use different standards, such as units of measure and communication protocols. AWS IoT Things Graph makes it possible to build IoT applications with little to no code by connecting devices and services and defining how they interact at an abstract level. For more information about how AWS IoT Things Graph works, see the User Guide. The AWS IoT Things Graph service is discontinued",
   subcommands: [
     {
       name: "associate-entity-to-thing",
@@ -243,7 +243,7 @@ const completionSpec: Fig.Spec = {
     {
       name: "delete-namespace",
       description:
-        "Deletes the specified namespace. This action deletes all of the entities in the namespace. Delete the systems and flows that use entities in the namespace before performing this action",
+        "Deletes the specified namespace. This action deletes all of the entities in the namespace. Delete the systems and flows that use entities in the namespace before performing this action. This action takes no request parameters",
       options: [
         {
           name: "--cli-input-json",
@@ -1469,7 +1469,7 @@ const completionSpec: Fig.Spec = {
         },
         {
           name: "--tags",
-          description: "A list of tags to add to the resource.&gt;",
+          description: "A list of tags to add to the resource.>",
           args: {
             name: "list",
           },
@@ -1714,5 +1714,4 @@ const completionSpec: Fig.Spec = {
     },
   ],
 };
-
 export default completionSpec;

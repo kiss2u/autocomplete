@@ -1,19 +1,41 @@
 // To learn more about Fig's autocomplete standard visit: https://fig.io/docs/concepts/cli-skeleton
 
-// The below is a dummy example for git. Make sure to change the file name!
+const fileExists = async (
+  executeCommand: Fig.ExecuteCommandFunction,
+  file: string
+) => {
+  return (
+    // eslint-disable-next-line @withfig/fig-linter/no-useless-arrays
+    (await executeCommand({ command: "ls", args: [file] })).status === 0
+  );
+};
+
 const completionSpec: Fig.Spec = {
   name: "php",
   description: "Run the PHP interpreter",
   generateSpec: async (tokens, executeShellCommand) => {
     const subcommands = [];
 
-    if ((await executeShellCommand("ls -1 artisan")) === "artisan") {
-      subcommands.push({ name: "artisan", loadSpec: "php/artisan" });
-    }
-
-    if ((await executeShellCommand("ls -1 please")) === "please") {
-      subcommands.push({ name: "please", loadSpec: "php/please" });
-    }
+    await Promise.all([
+      (async () => {
+        if (await fileExists(executeShellCommand, "artisan")) {
+          subcommands.push({ name: "artisan", loadSpec: "php/artisan" });
+        }
+      })(),
+      (async () => {
+        if (await fileExists(executeShellCommand, "please")) {
+          subcommands.push({ name: "please", loadSpec: "php/please" });
+        }
+      })(),
+      (async () => {
+        if (await fileExists(executeShellCommand, "bin/console")) {
+          subcommands.push({
+            name: "bin/console",
+            loadSpec: "php/bin-console",
+          });
+        }
+      })(),
+    ]);
 
     return {
       name: "php",

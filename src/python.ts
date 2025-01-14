@@ -1,12 +1,17 @@
+import { filepaths } from "@fig/autocomplete-generators";
+
 const completionSpec: Fig.Spec = {
   name: "python",
   description: "Run the python interpreter",
   generateSpec: async (tokens, executeShellCommand) => {
-    const isDjangoManagePyFilePresentCommand =
-      "cat manage.py | grep -q django; echo $?";
-
+    const isDjangoManagePyFilePresentCommand = "cat manage.py | grep -q django";
     if (
-      (await executeShellCommand(isDjangoManagePyFilePresentCommand)) === "0"
+      (
+        await executeShellCommand({
+          command: "bash",
+          args: ["-c", isDjangoManagePyFilePresentCommand],
+        })
+      ).status === 0
     ) {
       return {
         name: "python",
@@ -17,23 +22,10 @@ const completionSpec: Fig.Spec = {
   args: {
     name: "python script",
     isScript: true,
-    generators: {
-      template: "filepaths",
-      filterTemplateSuggestions: function (paths) {
-        return paths
-          .filter((file) => {
-            return file.name.endsWith(".py") || file.name.endsWith("/");
-          })
-          .map((file) => {
-            const isPyFile = file.name.endsWith(".py");
-
-            return {
-              ...file,
-              priority: isPyFile && 76,
-            };
-          });
-      },
-    },
+    generators: filepaths({
+      extensions: ["py"],
+      editFileSuggestions: { priority: 76 },
+    }),
   },
   options: [
     {

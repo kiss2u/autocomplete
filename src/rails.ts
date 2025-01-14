@@ -1,3 +1,5 @@
+import { filepaths } from "@fig/autocomplete-generators";
+
 const RB_ICON =
   "https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_ruby.svg";
 
@@ -159,7 +161,6 @@ const newCommand = {
       name: "--skip-webpack-install]",
       description: "Don't run Webpack install",
     },
-
     {
       name: ["--f", "--force"],
       description: "Overwrite files that already exist",
@@ -355,7 +356,7 @@ const dbOptions = [
 
 const defaultCommands: Fig.Subcommand[] = [
   {
-    name: "console",
+    name: ["c", "console"],
     description: "Interact with your Rails application from the command line",
     options: [
       {
@@ -476,13 +477,40 @@ const defaultCommands: Fig.Subcommand[] = [
     ],
   },
   {
+    name: "notes",
+    description: "Enumerate all annotations",
+    options: [
+      {
+        name: ["-a", "--annotations"],
+        requiresSeparator: true,
+        args: {
+          name: "annotations",
+          isVariadic: true,
+          description: "Filter by specific annotations, e.g. Foobar TODO",
+        },
+      },
+    ],
+  },
+  {
     name: "generate",
     description: "Use templates to generate Rails resources",
     args: [
       {
         name: "generator",
+        filterStrategy: "fuzzy",
+        suggestions: [
+          "model",
+          "resource",
+          "scaffold",
+          "controller",
+          "migration",
+        ],
         generators: {
-          script: "rails g --help",
+          script: ["rails", "g", "--help"],
+          cache: {
+            cacheByDirectory: true,
+            strategy: "stale-while-revalidate",
+          },
           postProcess(out) {
             const lines = out.split("Rails:")[1].trim().split("\n");
 
@@ -573,25 +601,19 @@ const defaultCommands: Fig.Subcommand[] = [
     description: "Run your test suite",
     args: {
       name: "files or directories",
-      generators: {
-        template: ["filepaths", "folders"],
-        filterTemplateSuggestions: (paths) => {
-          return paths
-            .filter((file) => {
-              const name = file.name as string;
-              return name.endsWith(".rb") || name.endsWith("/");
-            })
-            .map((file) => ({
-              ...file,
-              icon: file.type === "file" ? RB_ICON : file.icon,
-            }));
-        },
-      },
+      generators: filepaths({
+        extensions: ["rb"],
+        editFileSuggestions: { icon: RB_ICON },
+      }),
       isOptional: true,
     },
     async generateSpec(_, executeShellCommand) {
-      const helpText = await executeShellCommand("rails test --help");
-      const argRegex = /(?:(-[a-zA-Z]), )?(--[^ ]+?)[ =]([A-Z_]+)?[ \r\n]+([^\n]+)/g;
+      const { stdout: helpText } = await executeShellCommand({
+        command: "rails",
+        args: ["test", "--help"],
+      });
+      const argRegex =
+        /(?:(-[a-zA-Z]), )?(--[^ ]+?)[ =]([A-Z_]+)?[ \r\n]+([^\n]+)/g;
 
       const options = Array.from(helpText.matchAll(argRegex)).map((match) => {
         const [_match, _short, long, arg, description] = match;
@@ -608,30 +630,17 @@ const defaultCommands: Fig.Subcommand[] = [
   newCommand,
 ];
 
-const checkRailsInstalled = async (
-  executeShellCommand: Fig.ExecuteShellCommandFunction
-): Promise<boolean> => {
-  const gemfileMatch = await executeShellCommand(
-    `until [[ -f Gemfile ]] || [[ $PWD = '/' ]]; do cd ..; done; if [ -f Gemfile ]; then cat Gemfile | \grep "gem 'rails'"; else echo ""; fi`
-  );
-  const isRails = !!gemfileMatch;
-
-  return isRails;
-};
-
 // Generator that searches asynchronously for more Rails commands through the help command
 export const railsCommandsGenerator: Fig.Generator = {
   custom: async (_, executeShellCommand) => {
-    const isRails = await checkRailsInstalled(executeShellCommand);
-
-    if (!isRails) {
-      return [];
-    }
-
     // parse help text to find more commands
     let commands: Fig.Subcommand[] = [];
     try {
-      const helpText = await executeShellCommand("rails --tasks");
+      const { stdout: helpText } = await executeShellCommand({
+        command: "rails",
+        // eslint-disable-next-line @withfig/fig-linter/no-useless-arrays
+        args: ["--tasks"],
+      });
 
       const defaultCommandNames = defaultCommands.map((c) => c.name);
       const matches = Array.from(helpText.matchAll(/rails ([^ ]+)/g));
@@ -645,6 +654,7 @@ export const railsCommandsGenerator: Fig.Generator = {
     return commands;
   },
   cache: {
+    strategy: "stale-while-revalidate",
     ttl: 1000 * 60 * 60 * 24 * 3, // 3 days
     cacheByDirectory: true,
   },
@@ -653,10 +663,20 @@ export const railsCommandsGenerator: Fig.Generator = {
 const completionSpec: Fig.Spec = {
   name: "rails",
   description: "Ruby on Rails CLI",
+  icon: "https://avatars.githubusercontent.com/u/4223?s=48&v=4",
   generateSpec: async (_, executeShellCommand) => {
-    const isRails = await checkRailsInstalled(executeShellCommand);
+    const isRailsDirectory =
+      (
+        await executeShellCommand({
+          command: "bash",
+          args: [
+            "-c",
+            `until [[ -f Gemfile ]] || [[ $PWD = '/' ]]; do cd ..; done; if [ -f Gemfile ]; then cat Gemfile | \\grep "gem ['\\"]rails['\\"]"; fi`,
+          ],
+        })
+      ).status === 0;
 
-    if (!isRails) {
+    if (!isRailsDirectory) {
       return {
         name: "rails",
         subcommands: [newCommand],
@@ -666,11 +686,11 @@ const completionSpec: Fig.Spec = {
     return {
       name: "rails",
       subcommands: defaultCommands,
+      args: {
+        generators: railsCommandsGenerator,
+        isOptional: true,
+      },
     };
-  },
-  args: {
-    generators: railsCommandsGenerator,
-    isOptional: true,
   },
 };
 

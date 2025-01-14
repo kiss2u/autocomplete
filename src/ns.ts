@@ -27,7 +27,7 @@ const deviceOption: Fig.Option = {
     name: "device id",
     // TODO: create a generator of ns device <platform> --available-devices
     // generators: {
-    //   script: "ns devices --json",
+    //   script: ["ns", "devices", "--json"],
     //   postProcess: (output) => {
     //     return [{
     //       name: "test1",
@@ -89,7 +89,7 @@ const helpOption = (label: string): Fig.Option => {
 };
 
 /**
- * Plaform options used across many commands of the CLI
+ * Platform options used across many commands of the CLI
  */
 const androidGeneralOptions: Fig.Option[] = [
   {
@@ -191,6 +191,7 @@ const platformEnvOptions: Fig.Option[] = [
     description:
       "Add file replacement rules. For source files (.js and .ts) this will add a new alias to the config, for everything else, this will add a new copy rule",
     insertValue: "--env.replace={cursor}:",
+    requiresSeparator: true,
   },
 ];
 
@@ -544,8 +545,11 @@ const createCommand: Fig.Subcommand = {
       args: {
         name: "template",
         generators: {
-          script:
-            "curl https://api.github.com/repos/NativeScript/nativescript-app-templates/contents/packages",
+          script: [
+            "curl",
+            "-sfL",
+            "https://api.github.com/repos/NativeScript/nativescript-app-templates/contents/packages",
+          ],
           cache: {
             ttl: 100 * 24 * 60 * 60 * 1000, // 100days
           },
@@ -1177,7 +1181,7 @@ const deviceCommand: Fig.Subcommand = {
         name: "application id",
         description: "The application identifier", //TODO: generator $ tns device list-applications.
         // generators: {
-        //   script: "ns device list-applications",
+        //   script: ["ns", "device", "list-applications"],
         //   postProcess: (output) => {
         //     return JSON.parse(output).map((branch) => {
         //       const template = branch?.name;

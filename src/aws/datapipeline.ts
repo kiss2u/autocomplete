@@ -988,9 +988,8 @@ const completionSpec: Fig.Spec = {
     {
       name: "create-default-roles",
       description:
-        "Creates the default IAM role DataPipelineDefaultRole and DataPipelineDefaultResourceRole which are used while creating an EMR cluster.\nIf the roles do not exist, create-default-roles will automatically create them and set their policies. If these roles are already created create-default-roles will not update their policies.\n",
+        'NOTE: \nSupport for this command has been deprecated and may fail to create these roles\nif they do not already exist. For more information on managing these policies\nmanually see the following documentation:\n\nhttps://docs.aws.amazon.com/datapipeline/latest/DeveloperGuide/dp-iam-roles.html\n\n\nCreates the default IAM role "DataPipelineDefaultRole" and "DataPipelineDefaultResourceRole" which are used while creating an EMR\ncluster.\n\nIf these roles do not exist, create-default-roles will automatically create\nthem and set their policies.\n\nIf these roles have already been created create-default-roles will not update\ntheir policies',
     },
   ],
 };
-
 export default completionSpec;

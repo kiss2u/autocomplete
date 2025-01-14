@@ -1,7 +1,7 @@
 const domain: Fig.Arg = {
   name: "domain",
   generators: {
-    script: "defaults domains",
+    script: ["defaults", "domains"],
     postProcess: function (out) {
       return out.split(",").map((domain) => {
         return {
@@ -100,7 +100,6 @@ const valueArgs = [
 const completionSpec: Fig.Spec = {
   name: "defaults",
   description: "Command line interface to a user's defaults",
-
   subcommands: [
     {
       name: "read",
@@ -109,7 +108,6 @@ const completionSpec: Fig.Spec = {
     },
     {
       name: "write",
-
       description: "Writes key for domain",
       args: [domain, key, value],
     },

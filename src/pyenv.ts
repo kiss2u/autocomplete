@@ -1,22 +1,26 @@
 const versionList: Fig.Generator = {
-  script: "pyenv install -l",
+  script: ["pyenv", "install", "-l"],
   postProcess: function (out) {
     return out
+      .trim()
       .split("\n")
       .slice(1)
-      .map((name) => ({ name, icon: "🐍" }));
+      .map((name) => ({ name: name.trim(), icon: "🐍" }));
   },
 };
 
 const globalList: Fig.Generator = {
-  script: "pyenv versions",
+  script: ["pyenv", "versions"],
   postProcess: function (out) {
-    return out.split("\n").map((l) => {
-      const sel = l.match(/\s*\*/) != null;
-      const name = sel ? l.replace("*", "").trim() : l.trim();
-      const icon = sel ? "🌟" : "🐍";
-      return { name, icon };
-    });
+    return out
+      .trim()
+      .split("\n")
+      .map((l) => {
+        const sel = l.match(/\s*\*/) != null;
+        const name = sel ? l.replace("*", "").trim() : l.trim();
+        const icon = sel ? "🌟" : "🐍";
+        return { name, icon };
+      });
   },
 };
 

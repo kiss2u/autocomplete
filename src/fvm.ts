@@ -1,4 +1,5 @@
-const semverRegex = /((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)/gm;
+const semverRegex =
+  /((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)/gm;
 
 const globalOptions: Fig.Option[] = [
   {
@@ -102,7 +103,7 @@ const completionSpec: Fig.Spec = {
           },
         ],
         generators: {
-          script: "fvm releases",
+          script: ["fvm", "releases"],
           postProcess: function (out): Fig.Suggestion[] {
             const matches = out.match(semverRegex);
             const matchesSet = [...new Set(matches)];

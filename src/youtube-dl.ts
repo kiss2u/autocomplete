@@ -1,9 +1,11 @@
 const youtubeDlGenerators: Record<string, Fig.Generator> = {
   listVideos: {
-    script: (context) =>
-      `youtube-dl --flat-playlist -J ${context.filter((token) =>
-        token.includes("youtube.")
-      )}`,
+    script: (context) => [
+      "youtube-dl",
+      "--flat-playlist",
+      "-J",
+      ...context.filter((token) => token.includes("youtube.")),
+    ],
 
     postProcess: function (out) {
       try {
@@ -12,8 +14,7 @@ const youtubeDlGenerators: Record<string, Fig.Generator> = {
             name: `${index + 1} - ${video.title}`,
             description: video.uploader,
             insertValue: `${index + 1}`,
-            icon:
-              "https://www.youtube.com/s/desktop/810941b4/img/favicon_32.png",
+            icon: "https://www.youtube.com/s/desktop/810941b4/img/favicon_32.png",
           };
         });
       } catch (e) {
@@ -24,7 +25,7 @@ const youtubeDlGenerators: Record<string, Fig.Generator> = {
   },
 
   listClipboard: {
-    script: "pbpaste",
+    script: ["pbpaste"],
     postProcess: function (out) {
       const regex = new RegExp(
         "^(https?://)?(www.)?(youtube.com|youtu.?be)/.+$"
@@ -35,8 +36,7 @@ const youtubeDlGenerators: Record<string, Fig.Generator> = {
             {
               name: out,
               description: "Clipboard",
-              icon:
-                "https://www.youtube.com/s/desktop/810941b4/img/favicon_32.png",
+              icon: "https://www.youtube.com/s/desktop/810941b4/img/favicon_32.png",
             },
           ];
       } catch (e) {
@@ -182,7 +182,6 @@ const completionSpec: Fig.Spec = {
       description:
         "Do not bypass geographic restriction via faking X-Forwarded-For HTTP header",
     },
-
     {
       name: "--geo-bypass-country",
       description:
@@ -944,20 +943,27 @@ const completionSpec: Fig.Spec = {
       args: {
         name: "MSO",
         generators: {
-          script: (context) =>
-            `youtube-dl ${context.filter((token) =>
-              token.includes("youtube.")
-            )} --simulate --ap-list-mso | tail -n +3 | tr -s " "`,
+          custom: async (tokens, executeCommand, context) => {
+            const { stdout } = await executeCommand({
+              command: "youtube-dl",
+              args: [
+                ...tokens.filter((token) => token.includes("youtube.")),
+                "--simulate",
+                "--ap-list-mso",
+              ],
+            });
 
-          postProcess: (out) =>
-            out.split("\n").map((line) => {
-              const [name, ...description] = line.split(" ");
-
-              return {
-                name,
-                description: description.join(" "),
-              };
-            }),
+            return stdout
+              .split("\n")
+              .slice(3)
+              .map((line) => {
+                const [name, ...description] = line.split(" ");
+                return {
+                  name,
+                  description: description.join(" "),
+                };
+              });
+          },
         },
       },
     },
@@ -1044,7 +1050,7 @@ const completionSpec: Fig.Spec = {
         "Embed subtitles in the video (only for mp4, webm and mkv videos)",
     },
     {
-      name: "--embed-thumbnails",
+      name: "--embed-thumbnail",
       description: "Embed thumbnail in the audio as cover art",
     },
     {
@@ -1054,7 +1060,7 @@ const completionSpec: Fig.Spec = {
     {
       name: "--metadata-from-title",
       description:
-        "Parse additional metadata like song title / artist from teh video title. The format syntax is the same as --output. Regular expressions with named capture groups may also be used. The parsed parameters replace existing values",
+        "Parse additional metadata like song title / artist from the video title. The format syntax is the same as --output. Regular expressions with named capture groups may also be used. The parsed parameters replace existing values",
       args: {
         name: "FORMAT",
       },

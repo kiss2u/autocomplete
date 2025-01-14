@@ -1,157 +1,181 @@
-<p align="center">
-    <img width="300" src="https://github.com/withfig/fig/blob/main/static/FigBanner.png?raw=true#gh-light-mode-only"/>
-    <img width="300" src="https://github.com/withfig/fig/blob/main/static/FigBannerInverted.png?raw=true#gh-dark-mode-only"/>
-</p>
+[![Badge: macOS](https://img.shields.io/badge/os-%20macOS-light)](#)
+[![Badge: Documentation](https://img.shields.io/badge/documentation-black)](https://fig.io/docs/)
+[![Badge: contributors](https://img.shields.io/github/contributors/withfig/autocomplete)](#Contributors)
 
----
-
-![os](https://img.shields.io/badge/os-%20macOS-light)
-[![Signup](https://img.shields.io/badge/signup-public%20beta-blueviolet)](https://fig.io?ref=github_autocomplete)
-[![Documentation](https://img.shields.io/badge/documentation-black)](https://fig.io/docs/)
-[![All-Contributors](https://img.shields.io/github/contributors/withfig/autocomplete)](#Contributors)
-![Discord](https://img.shields.io/discord/837809111248535583?color=768ad4&label=discord)
-[![Twitter](https://img.shields.io/twitter/follow/fig.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=fig)
-
-**[Fig](https://fig.io?ref=github_autocomplete) adds autocomplete to your terminal.** 
-
-As you type, Fig pops up subcommands, options, and contextually relevant arguments in your existing terminal on macOS.
-
-
-![Fig Visual Autocomplete For Your Terminal Demo](https://fig.io/gifs/demo-with-header.gif)
-
-<br/>
+**[Amazon Q Developer in the command line](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-getting-started-installing.html)
+adds IDE-style completions for hundreds of popular CLIs like `git`, `npm`,
+`docker`, and `aws`. Start typing, and Amazon Q populates contextually relevant
+subcommands, options and arguments.**
 
 ## ⚡️ Installation
-##### With [Homebrew](https://brew.sh): 
-```
-brew install fig
-```
-##### Manually: 
-Download the macOS app at [fig.io/download](https://fig.io/download).
 
-## 👋 Add a completion spec for a CLI tool
+- **macOS**:
+  - **DMG**: Download from AWS:
+    [aws.amazon.com](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-getting-started-installing.html)
+  - **Homebrew**: `brew install amazon-q`
+- **Linux/Windows**:
+  - Follow the discussions for
+    [Linux](https://github.com/aws/q-command-line-discussions/discussions/14) or
+    [Windows](https://github.com/aws/q-command-line-discussions/discussions/15)
+- **Remote machines**
+  - [Autocomplete in SSH](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-autocomplete-ssh.html)
 
-Want to add autocomplete to a CLI tool (or make changes to an existing autocomplete spec)? We welcome contributions!
-
-Completion specs are defined in a _declarative_ schema that specifies `subcommands`, `options` and `arguments`. Suggestions are generated from information in the spec or can be generated dynamically by running shell commands or reading local files.
-
-**For documentation and tutorials**, visit
-[fig.io/docs](https://fig.io/docs).
-
-**To request autocomplete for a CLI tool**, open an [issue](https://github.com/withfig/autocomplete/issues/new/choose).
+> NOTE: Once it's downloaded, launch the app to set up Amazon Q for command
+> line!
 
 <br/>
 
-## 😎 Get Started
+![Demo of Amazon Q's CLI Completions in a terminal](https://docs.aws.amazon.com/images/amazonq/latest/qdeveloper-ug/images/command-line-completions.gif)
 
-Build your first spec in 3 min or less: [fig.io/docs/getting-started](https://fig.io/docs/getting-started)
+<br/>
+
+## 👋 What are "completion specs"?
+
+A completion spec is a _declarative_ schema that specifies the `subcommands`,
+`options` and `args` for a CLI tool. Amazon Q uses these schemas to generate
+suggestions.
+
+<br/>
+
+## 😎 Contribute your first spec in < 3 minutes
+
+Use the steps below or follow our getting started guide:
+[fig.io/docs](https://fig.io/docs)
 
 **Prerequisites:**
 
-- Early access to the Fig macOS app.
-  > If you don't have access yet, sign up for the [waitlist](https://fig.io) and say you're interested in building completions!
-- Node and NPM (or Yarn).
+- Download Amazon Q for command line
+- Node and Pnpm
 
 <br/>
 
-**Setup:**
+**Steps**
 
-1. Click [here](https://GitHub.com/withfig/autocomplete/fork/) to fork this repo.
+1. Make sure you have `pnpm` [installed](https://pnpm.io/installation), as
+   that's the package manager used in this repo.
 
-2. Clone your forked repo and create an example spec
+2. Click [here](https://GitHub.com/withfig/autocomplete/fork/) to fork this
+   repo.
 
-```bash
-# Replace `YOUR_GITHUB_USERNAME` with your own github username
-git clone https://github.com/YOUR_GITHUB_USERNAME/autocomplete.git fig-autocomplete
-cd fig-autocomplete
+3. Clone your forked repo and create an example spec
 
-# Add withfig/autocomplete as a remote
-git remote add upstream https://github.com/withfig/autocomplete.git
+   ```bash
+   # Replace `YOUR_GITHUB_USERNAME` with your own GitHub username
+   git clone https://github.com/YOUR_GITHUB_USERNAME/autocomplete.git autocomplete
+   cd autocomplete
 
-# Install packages
-npm install
+   # Add withfig/autocomplete as a remote
+   git remote add upstream https://github.com/withfig/autocomplete.git
 
-# Create an example spec (call it "abc")
-npm run create-spec abc
+   # Install packages
+   pnpm install
 
-# Turn on "dev mode"
-npm run dev
-```
+   # Create an example spec (call it "abc")
+   pnpm create-spec abc
 
-3. Now go to your terminal and type `abc[space]`. Your example spec will appear. 😊
+   # Turn on "dev mode"
+   pnpm dev
+   ```
+
+4. Now go to your terminal and type `abc[space]`. Your example spec will appear.
+   😊
 
 #### Other things to know
 
-- Edit your spec in typescript in the `src/` folder
+- Edit your spec in TypeScript in the `src/` folder
 - On save, specs are compiled to the `build/` folder
-- In **dev mode** specs are read from the `build` folders. Otherwise they are read from `~/.fig/autocomplete`
+- In **dev mode**, specs are read from the `build` folder, and generators run
+  every keystroke.
 
-<br/>
+<br>
 
 ## 📦 Other available package.json commands
 
 ```bash
-
 # Typecheck all specs in the src/ folder
-npm test
+pnpm test
 
 # Compile typescripts specs from src/ folder to build/ folder
-npm run build
+pnpm build
 
-# Copy all specs from the build/ folder to the ~/.fig/autocomplete folder
-npm run copy:all
-
-# Copy an individual spec from the build/ folder to the ~/.fig/autocomplete folder
-npm run copy <spec-name>
+# Lint and fix issues
+pnpm lint:fix
 ```
 
-**We would love contributions for**
-* any other completion spec for CLI tools you use regularly
-* generators for existing specs
+## 🔥 Contributions
 
-Never submitted a PR before? Check out our [How to Contribute](https://fig.io/docs/getting-started/contributing) guide. Many of Fig's 100+ contributors made their first open source contribution to Fig too!
+We would love contributions for:
 
-## 😊 Need Help?
+- New completion specs
+- Errors with existing completion specs (e.g. missing subcommands, options, or
+  arguments)
+- [Generators](https://fig.io/docs/getting-started/generating-argument-suggestions)
+  for argument suggestions
+- Better descriptions, icons etc
+- [Themes](https://github.com/withfig/themes)!
 
-<p align="center">
-    Join our community
-<br/>
-<a href="https://fig.io/community">
-    <img src="http://fig.io/icons/discord-logo-square.png" width="80px" height="80px" /> 
-</a>
-</p>
+If you aren't able to contribute, please feel free to open an
+[issue](https://github.com/withfig/autocomplete/issues/new/choose).
 
 ## 🙋‍♀️ FAQ
 
-#### What terminals does Fig work with?
+#### What terminals does Amazon Q work with?
 
-Fig works with iTerm, the native MacOS Terminal app, Hyper and the integrated terminal in VSCode.
+Amazon Q for command line works with the native macOS Terminal app, [iTerm],
+[Tabby], [Hyper], [Kitty], [WezTerm], and [Alacritty]. It also works in the
+integrated terminals of [VSCode], [JetBrains IDEs], [Android Studio], and
+[Nova].
 
-#### How does Fig work?
+[iterm]: https://iterm2.com
+[tabby]: https://tabby.sh
+[hyper]: https://hyper.is
+[kitty]: https://sw.kovidgoyal.net/kitty
+[wezterm]: https://wezfurlong.org/wezterm/
+[alacritty]: https://alacritty.org/
+[vscode]: https://code.visualstudio.com/
+[jetbrains ides]: https://www.jetbrains.com/
+[android studio]: https://developer.android.com/studio
+[nova]: https://nova.app/
 
-Fig uses the Accessibility API on Mac to position the window, insert text on your behalf, and read what you've typed in your terminal.
+Want to see another terminal included? Check our
+[issue tracker](https://github.com/aws/q-command-line-discussions) and add your
+support for it!
 
-#### Does Fig work on Windows or Linux?
+#### How does Amazon Q for command line work?
 
-Currently, Fig is only available on MacOS.
+Amazon Q for command line uses the Accessibility API on Mac to position the
+window, and integrates with your shell to read what you've typed.
 
-#### How can I get access?
+#### Does Amazon Q for command line work on Windows or Linux?
 
-Fig is currently in a _public_ beta. You can install Fig by running `brew install fig` or by downloading the app at [fig.io/download](https://fig.io/download).
+Not yet, Amazon Q for command line is only available on macOS for now.
+[Windows](https://github.com/aws/q-command-line-discussions/discussions/15) and
+[Linux](https://github.com/aws/q-command-line-discussions/discussions/14)
+support is in progress!
 
-#### Can I use Fig to build autocomplete for my team's internal scripts and CLI tools?
+#### How can I download Amazon Q?
 
-Yes! Check out our guide on how to [get started building autocomplete specs](https://fig.io/docs/getting-started).
+Run `brew install amazon-q` or, downloading the app at
+[aws.amazon.com](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-getting-started-installing.html).
+Then, launch the Amazon Q app!
 
-#### Did we miss something?
+#### How do I submit a PR?
 
-Get in touch at hello@fig.io or chat with us in [Discord](https://fig.io/community).
+Check out our
+[How to Contribute](https://fig.io/docs/getting-started/contributing) guide.
+Many of Amazon Q's 400+ contributors made their first open source contribution
+to Amazon Q!
+
+#### Amazon Q for command line doesn't work for me!
+
+Run `q doctor` to automatically debug issues with your installation. Otherwise
+make an issue in our GitHub discussions community:
+[aws/q-command-line-discussions](https://github.com/aws/q-command-line-discussions/discussions)
 
 <br/>
 
 ## ✨ Contributors
 
 <a href="https://github.com/withfig/autocomplete/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=withfig/autocomplete" />
+  <img alt="Grid of profile icons of the 400+ contributors" src="https://contrib.rocks/image?repo=withfig/autocomplete" />
 </a>
-<!--  https://contrib.rocks -->

@@ -1,7 +1,5 @@
-const SPLIT_CHAR = "END";
-
 const getPackages: Fig.Generator = {
-  script: "lerna ls",
+  script: ["lerna", "ls"],
   postProcess: (output) =>
     output.split("\n").map((packageName) => ({
       name: packageName,
@@ -10,7 +8,7 @@ const getPackages: Fig.Generator = {
 };
 
 const getBranches: Fig.Generator = {
-  script: "git branch --no-color",
+  script: ["git", "branch", "--no-color"],
   postProcess: function (out) {
     if (out.startsWith("fatal:")) {
       return [];
@@ -27,10 +25,14 @@ const getBranches: Fig.Generator = {
 
 const getAllScriptsFromPackages: Fig.Generator = {
   // Get all lerna packages, loop over them and get content of package.json
-  script: `lerna list -p | while read p; do\n \cat $p/package.json && echo ${SPLIT_CHAR}\ndone`,
+  script: [
+    "bash",
+    "-c",
+    "lerna list -p | while read p; do\n \\cat $p/package.json && echo END\ndone",
+  ],
   postProcess: (output) => {
     // Split output by the divider and remove empty entry
-    const packages = output.split(SPLIT_CHAR).filter((e) => e.trim() !== "");
+    const packages = output.split("END").filter((e) => e.trim() !== "");
 
     let scripts: string[] = [];
     packages.forEach((packageContent) => {
@@ -353,7 +355,7 @@ const completionSpec: Fig.Spec = {
         ...globalOptions,
         {
           name: "--flatten",
-          description: "Fla thte git history of the repository to import",
+          description: "Flatten the git history of the repository to import",
         },
         {
           name: "--dest",
@@ -504,7 +506,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--create-release",
           description:
-            "Create an official release based on the changes pacakges",
+            "Create an official release based on the changes packages",
           args: {
             name: "type",
             suggestions: [
@@ -514,8 +516,7 @@ const completionSpec: Fig.Spec = {
               },
               {
                 name: "gitlab",
-                icon:
-                  "https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/a0178a3dfdb9c4e34857bad3d2d788036baa0c76/icons/gitlab.svg",
+                icon: "https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/a0178a3dfdb9c4e34857bad3d2d788036baa0c76/icons/gitlab.svg",
               },
             ],
           },
@@ -537,13 +538,12 @@ const completionSpec: Fig.Spec = {
           args: {
             name: "remote",
             generators: {
-              script: "git remote",
+              script: ["git", "remote"],
               postProcess: (output) => {
                 return output.split("\n").map((remoteName) => ({
                   name: remoteName,
                   description: "Remote",
-                  icon:
-                    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Git_icon.svg/1024px-Git_icon.svg.png",
+                  icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Git_icon.svg/1024px-Git_icon.svg.png",
                 }));
               },
             },
@@ -583,7 +583,7 @@ const completionSpec: Fig.Spec = {
         },
         {
           name: "--no-commit-hooks",
-          description: "Disable runing git commit hooks",
+          description: "Disable running git commit hooks",
         },
         {
           name: "--no-git-tag-version",

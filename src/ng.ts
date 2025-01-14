@@ -3,7 +3,7 @@ interface ProjectDetails {
 }
 
 const projectsGenerator = {
-  script: "ng config projects",
+  script: ["ng", "config", "projects"],
   postProcess: function (out) {
     try {
       const projects = JSON.parse(out);
@@ -124,6 +124,10 @@ const completionSpec: Fig.Spec = {
           options: [projectsOption],
         },
       ],
+    },
+    {
+      name: "version",
+      description: "View your Angular CLI version (update for Angular 14+)",
     },
   ],
   options: [

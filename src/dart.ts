@@ -174,7 +174,7 @@ const completionSpec: Fig.Spec = {
       ],
       args: {
         name: "directory",
-        description: "Dart project directoy to analyze",
+        description: "Dart project directory to analyze",
         template: "folders",
       },
     },
@@ -236,24 +236,20 @@ const completionSpec: Fig.Spec = {
             default: "console-simple",
             suggestions: [
               {
-                name: "console-simple",
+                name: "console",
                 description: "A simple command-line application",
               },
               {
-                name: "console-full",
-                description: "A command-line application sample",
-              },
-              {
-                name: "package-simple",
+                name: "package",
                 description:
                   "A starting point for Dart libraries or applications",
               },
               {
-                name: "server-simple",
+                name: "server-shelf",
                 description: "A web server built using package:shelf",
               },
               {
-                name: "web-simple",
+                name: "web",
                 description: "A web app that uses only core Dart libraries",
               },
             ],
@@ -272,7 +268,7 @@ const completionSpec: Fig.Spec = {
           exclusiveOn: ["--pub"],
         },
         {
-          name: "--foce",
+          name: "--force",
           description:
             "Force project generation, even if the target directory already exists",
         },
@@ -702,7 +698,7 @@ const completionSpec: Fig.Spec = {
                 enableAsserts,
                 noEnableAsserts,
                 {
-                  name: "--enable-experiement",
+                  name: "--enable-experiment",
                   description:
                     "Runs the executable in a VM with the given experiments enabled. (Will disable snapshotting, resulting in slower startup)",
                   args: { name: "experiment" },
@@ -754,13 +750,13 @@ const completionSpec: Fig.Spec = {
             {
               name: "--dependency-overrides",
               description:
-                "Show resolutions with 'dependency_overries'. (defaults to on)",
+                "Show resolutions with 'dependency_overrides'. (defaults to on)",
               exclusiveOn: ["--no-dependency-overrides"],
             },
             {
               name: "--no-dependency-overrides",
               description:
-                "Do not show resolutions with 'dependency_overries'. (defaults to on)",
+                "Do not show resolutions with 'dependency_overrides'. (defaults to on)",
               exclusiveOn: ["--dependency-overrides"],
             },
             {
@@ -785,19 +781,19 @@ const completionSpec: Fig.Spec = {
             {
               name: "--no-prereleases",
               description:
-                "Do not inlcude prereleases in latest version. (defaults to off in --mode=null-safety)",
+                "Do not include prereleases in latest version. (defaults to off in --mode=null-safety)",
               exclusiveOn: ["--prereleases"],
             },
             {
               name: "--show-all",
               description:
-                "Include dependencies that are already fullfilling --mode",
+                "Include dependencies that are already fulfilling --mode",
               exclusiveOn: ["--no-show-all"],
             },
             {
               name: "--no-show-all",
               description:
-                "Do not include dependencies that are already fullfilling --mode",
+                "Do not include dependencies that are already fulfilling --mode",
               exclusiveOn: ["--show-all"],
             },
             {
@@ -934,12 +930,12 @@ const completionSpec: Fig.Spec = {
         {
           name: "--disable-service-auth-codes",
           description:
-            "Disables the requirement for an authentication code to communicate with the VM service. Authentication codes help protect against CSRF attacks, so it is not recommended to diable them unless behind a firewall on a secure device",
+            "Disables the requirement for an authentication code to communicate with the VM service. Authentication codes help protect against CSRF attacks, so it is not recommended to disable them unless behind a firewall on a secure device",
         },
         {
           name: "--enable-service-port-fallback",
           description:
-            "When the VM service is told to bind to a particular port, fallback to 0 if it fails to bind intead of failing to start",
+            "When the VM service is told to bind to a particular port, fallback to 0 if it fails to bind instead of failing to start",
         },
         {
           name: "--namespace",

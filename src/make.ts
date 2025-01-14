@@ -1,17 +1,73 @@
 const listTargets: Fig.Generator = {
-  script: `make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\\/\\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u`,
-  postProcess: function (out) {
-    const lines = out.split("\n");
-    const targets = [];
-    for (let i = 1; i < lines.length; i++) {
-      targets.push({
-        name: lines[i].trim(),
+  custom: async (tokens, executeShellCommand) => {
+    // Plain target suggestions. These will be overridden if we can find a description for them.
+    const { stdout } = await executeShellCommand({
+      command: "bash",
+      args: [
+        "-c",
+        "make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\\/\\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort -u",
+      ],
+    });
+
+    const targetSuggestions = new Map<string, Fig.Suggestion>();
+
+    for (const target of stdout.split("\n")) {
+      if (target === "Makefile") continue;
+      targetSuggestions.set(target, {
+        name: target.trim(),
         description: "Make target",
         icon: "🎯",
         priority: 80,
       });
     }
-    return targets;
+
+    const { stdout: makefile } = await executeShellCommand({
+      command: "cat",
+      args: ["Makefile", "makefile"],
+    });
+
+    const matches = makefile.matchAll(
+      /((?:^#.*\n)*)(?:^\.[A-Z_]+:.*\n)*(^\S*?):.*?(?:\s#+[ \t]*(.+))?$/gm
+    );
+    const specialTargets = new Set([
+      ".PHONY",
+      ".SUFFIXES",
+      ".DEFAULT",
+      ".PRECIOUS",
+      ".INTERMEDIATE",
+      ".SECONDARY",
+      ".SECONDEXPANSION",
+      ".DELETE_ON_ERROR",
+      ".IGNORE",
+      ".LOW_RESOLUTION_TIME",
+      ".SILENT",
+      ".EXPORT_ALL_VARIABLES",
+      ".NOTPARALLEL",
+      ".ONESHELL",
+      ".POSIX",
+    ]);
+    for (const match of matches) {
+      const [_, leadingComment, target, inlineComment] = match;
+
+      if (specialTargets.has(target)) continue;
+      if (/\$\(.+?\)/.test(target)) continue;
+
+      const name = target.trim();
+
+      const description = inlineComment
+        ? inlineComment.trim()
+        : leadingComment
+          ? leadingComment.replace(/^#+\s*/gm, "").trim()
+          : "Make target";
+
+      targetSuggestions.set(name, {
+        name,
+        description,
+        icon: "🎯",
+        priority: 80,
+      });
+    }
+    return [...targetSuggestions.values()];
   },
 };
 

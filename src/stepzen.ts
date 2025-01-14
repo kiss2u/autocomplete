@@ -3,7 +3,7 @@
 // Coded on stepzen/0.9.33 CLI version
 
 const endpointsGenerator: Fig.Generator = {
-  script: "stepzen list schemas",
+  script: ["stepzen", "list", "schemas"],
   postProcess: (output) => {
     try {
       return JSON.parse(output).map((endpoint: string) => {
@@ -19,7 +19,10 @@ const endpointsGenerator: Fig.Generator = {
 };
 
 const importSchemasGenerator: Fig.Generator = {
-  script: "curl https://api.github.com/repos/steprz/stepzen-schemas/contents",
+  script: [
+    "curl",
+    "https://api.github.com/repos/steprz/stepzen-schemas/contents",
+  ],
   postProcess: (output) => {
     try {
       return JSON.parse(output)
@@ -67,7 +70,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--dir",
           description: "The working directory for StepZen assets",
-          requiresEquals: true,
+          requiresSeparator: true,
           args: {
             name: "path",
             description: "Path to StepZen directory",
@@ -77,7 +80,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--endpoint",
           description: "The folder/endpoint to deploy to",
-          requiresEquals: true,
+          requiresSeparator: true,
           args: {
             name: "endpoint",
             description: "The StepZen endpoint",
@@ -87,7 +90,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--port",
           description: "The port number to use for the GraphiQL explorer",
-          requiresEquals: true,
+          requiresSeparator: true,
           args: {
             name: "port",
             description: "A port to run on",
@@ -107,7 +110,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--dir",
           description: "The directory to which the schema will be imported",
-          requiresEquals: true,
+          requiresSeparator: true,
           args: {
             name: "path",
             description: "Path to directory",

@@ -20,7 +20,7 @@ const completionSpec: Fig.Spec = {
       args: {
         generators: {
           /*
-           * Multiple envs can be set with a ',' seperator.
+           * Multiple envs can be set with a ',' separator.
            * We want to filter over this static list of suggestions
            * so we don't suggest envs that have already been entered.
            * */
@@ -115,8 +115,11 @@ const completionSpec: Fig.Spec = {
       args: {
         name: "Plugin",
         generators: {
-          script:
+          script: [
+            "bash",
+            "-c",
             "{ ls node_modules ; ls $(npm root -g) ; ls $(yarn global dir)/node_modules/ ; } | cat",
+          ],
           postProcess: (out) =>
             out
               .split("\n")

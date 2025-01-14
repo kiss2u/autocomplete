@@ -1,3 +1,5 @@
+import { filepaths } from "@fig/autocomplete-generators";
+
 const JS_ICON =
   "https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_js.svg";
 const GRADLE_ICON =
@@ -5,20 +7,14 @@ const GRADLE_ICON =
 const APPLE_ICON =
   "https://developer.apple.com/library/archive/Resources/1282/Images/apple2.png";
 const ANDROID_ICON = "https://www.android.com/static/images/fav/favicon.ico";
-const getJsFilesAndFolders = (paths) => {
-  const jsAndFolders = paths.filter((file) => {
-    return file.name.endsWith(".js") || file.name.endsWith("/");
-  });
-  return jsAndFolders.map((file) => {
-    return {
-      ...file,
-      icon: file.type === "file" ? JS_ICON : file.icon,
-    };
-  });
-};
+
+const getJsFilesAndFolders = filepaths({
+  extensions: ["js"],
+  editFileSuggestions: { icon: JS_ICON },
+});
 
 const workerGenerator = {
-  script: "sysctl -n hw.ncpu",
+  script: ["sysctl", "-n", "hw.ncpu"],
   postProcess: (scriptOutput: string) => {
     return Array.from({ length: Number(scriptOutput) }, (_x, i) => ({
       name: `${i}`,
@@ -26,7 +22,7 @@ const workerGenerator = {
   },
 };
 const xcodeConfigGenerator = {
-  script: "xcodebuild -project ios/*.xcodeproj  -list -json",
+  script: ["bash", "-c", "xcodebuild -project ios/*.xcodeproj  -list -json"],
   postProcess: (scriptOutput: string) => {
     const configurations = JSON.parse(scriptOutput).project.configurations;
 
@@ -35,7 +31,7 @@ const xcodeConfigGenerator = {
 };
 
 const xcodeSchemeGenerator = {
-  script: "xcodebuild -project ios/*.xcodeproj  -list -json",
+  script: ["bash", "-c", "xcodebuild -project ios/*.xcodeproj  -list -json"],
   postProcess: (scriptOutput: string) => {
     const configurations = JSON.parse(scriptOutput).project.schemes;
 
@@ -44,7 +40,7 @@ const xcodeSchemeGenerator = {
 };
 
 const androidGetDevicesGenerator = {
-  script: "adb devices",
+  script: ["adb", "devices"],
   postProcess: (scriptOutput: string) => {
     const devices = scriptOutput
       .split("\n")
@@ -62,7 +58,7 @@ const androidGetDevicesGenerator = {
 type IosRecordType = { name: string };
 
 const iosGetDevicesSimulatorGenerator = {
-  script: "xcrun simctl list --json devices available",
+  script: ["xcrun", "simctl", "list", "--json", "devices", "available"],
   postProcess: (scriptOutput: string) => {
     const devices = JSON.parse(scriptOutput).devices;
 
@@ -80,7 +76,7 @@ const iosGetDevicesSimulatorGenerator = {
 };
 
 const iosGetDevicesGenerator = {
-  script: "xcrun xctrace list devices",
+  script: ["xcrun", "xctrace", "list", "devices"],
   postProcess: (scriptOutput: string) => {
     const devices = scriptOutput
       .split("\n")
@@ -94,7 +90,7 @@ const iosGetDevicesGenerator = {
 };
 
 const iosGetDevicesUdidGenerator = {
-  script: "xcrun xctrace list devices",
+  script: ["xcrun", "xctrace", "list", "devices"],
   postProcess: (scriptOutput: string) => {
     const devices = scriptOutput
       .split("\n")
@@ -110,8 +106,8 @@ const iosGetDevicesUdidGenerator = {
   },
 };
 
-const gradleTasksGenerator = {
-  script: "cd android/ && ./gradlew tasks",
+const gradleTasksGenerator: Fig.Generator = {
+  script: ["bash", "-c", "cd android/ && ./gradlew tasks"],
   postProcess: (scriptOutput: string) => {
     const tasks = scriptOutput
       .split("\n")
@@ -157,10 +153,7 @@ const completionSpec: Fig.Spec = {
             "Path to the root JS file, either absolute or relative to JS root",
           args: {
             name: "file",
-            generators: {
-              template: "filepaths",
-              filterTemplateSuggestions: getJsFilesAndFolders,
-            },
+            generators: getJsFilesAndFolders,
           },
         },
         {
@@ -347,8 +340,7 @@ const completionSpec: Fig.Spec = {
         {
           name: "--npm",
           description: "Forces using npm for initialization",
-          icon:
-            "https://img.pngio.com/publishing-to-npm-from-kentcdodds-on-eggheadio-npm-png-800_800.png",
+          icon: "https://img.pngio.com/publishing-to-npm-from-kentcdodds-on-eggheadio-npm-png-800_800.png",
         },
         {
           name: "--directory",
@@ -484,10 +476,7 @@ const completionSpec: Fig.Spec = {
             "Path to a JavaScript file that exports a log reporter as a replacement for TerminalReporter",
           args: {
             name: "logFile",
-            generators: {
-              template: "filepaths",
-              filterTemplateSuggestions: getJsFilesAndFolders,
-            },
+            generators: getJsFilesAndFolders,
           },
         },
         {
@@ -545,10 +534,7 @@ const completionSpec: Fig.Spec = {
             "Path to the root JS file, either absolute or relative to JS root",
           args: {
             name: "file",
-            generators: {
-              template: "filepaths",
-              filterTemplateSuggestions: getJsFilesAndFolders,
-            },
+            generators: getJsFilesAndFolders,
           },
         },
         {
@@ -1087,7 +1073,7 @@ const completionSpec: Fig.Spec = {
   ],
   options: [
     {
-      name: "--version ",
+      name: "--version",
       description: "Print CLI version",
     },
     {

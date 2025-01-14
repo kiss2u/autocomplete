@@ -1,3 +1,5 @@
+import { filepaths } from "@fig/autocomplete-generators";
+
 type SearchResultData = {
   id: string;
   title: string;
@@ -7,7 +9,13 @@ type SearchResultData = {
 const packageGenerator: Fig.Generator = {
   script(context) {
     const searchTerm = context[context.length - 1];
-    return `curl -s -H "Accept: application/json" "https://azuresearch-usnc.nuget.org/query?packageType=DotnetTool&q=${searchTerm}"`;
+    return [
+      "curl",
+      "-s",
+      "-H",
+      "Accept: application/json",
+      `https://azuresearch-usnc.nuget.org/query?packageType=DotnetTool&q=${searchTerm}`,
+    ];
   },
   postProcess(out) {
     const searchResults: SearchResultData[] = JSON.parse(out).data;
@@ -29,7 +37,13 @@ const versionSearchGenerator: Fig.Generator = {
     const idx = command.findIndex((ctx) => commands.includes(ctx));
     const searchTerm = command[idx + 1].toLowerCase();
 
-    return `curl -s -H "Accept: application/json" "https://api.nuget.org/v3-flatcontainer/${searchTerm}/index.json"`;
+    return [
+      "curl",
+      "-s",
+      "-H",
+      "Accept: application/json",
+      `https://api.nuget.org/v3-flatcontainer/${searchTerm}/index.json`,
+    ];
   },
   postProcess(out) {
     const searchResults: string[] = JSON.parse(out).versions;
@@ -42,22 +56,7 @@ const versionSearchGenerator: Fig.Generator = {
   },
 };
 
-const configFileGenerator: Fig.Generator = {
-  template: "filepaths",
-  filterTemplateSuggestions(param) {
-    const expected = "nuget.config";
-
-    return param.filter((file) => {
-      if (typeof file.name === "string") {
-        const fileName = file.name;
-
-        return fileName === expected;
-      }
-
-      return false;
-    });
-  },
-};
+const configFileGenerator = filepaths({ equals: "nuget.config" });
 
 const toolListGenerator: Fig.Generator = {
   trigger: () => true,
@@ -65,10 +64,10 @@ const toolListGenerator: Fig.Generator = {
     const globalFlags = ["-g", "--global"];
 
     if (context.some((ctx) => globalFlags.includes(ctx))) {
-      return "dotnet tool list --global";
+      return ["dotnet", "tool", "list", "--global"];
     }
 
-    return "dotnet tool list";
+    return ["dotnet", "tool", "list"];
   },
   postProcess(out) {
     const lines = out.split("\n").slice(2);

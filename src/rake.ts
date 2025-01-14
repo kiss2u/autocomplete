@@ -1,10 +1,28 @@
 const completionSpec: Fig.Spec = {
   name: "rake",
   description: "A ruby build program with capabilities similar to make",
+  icon: "https://avatars.githubusercontent.com/u/210414?s=48&v=4",
   args: {
     name: "targets",
     isVariadic: true,
     isOptional: true,
+    generators: {
+      script: ["rake", "--tasks", "--silent"],
+      cache: {
+        strategy: "stale-while-revalidate",
+        cacheByDirectory: true,
+      },
+      postProcess: function (out) {
+        return out.split("\n").map((line) => {
+          const [name, description] = line.split("#");
+
+          return {
+            name: name.trim().slice("rake ".length),
+            description: description.trim(),
+          };
+        });
+      },
+    },
   },
   options: [
     {
@@ -17,7 +35,8 @@ const completionSpec: Fig.Spec = {
     },
     {
       name: ["-I", "--libdir"],
-      insertValue: "--libdir=",
+
+      requiresSeparator: true,
       description: "Include LIBDIR in the search path for required modules",
       args: {
         name: "LIBDIR",
@@ -34,7 +53,8 @@ const completionSpec: Fig.Spec = {
     },
     {
       name: ["-f", "--rakefile"],
-      insertValue: "--rakeFile=",
+
+      requiresSeparator: true,
       description: "Use FILE as the rakefile",
       args: {
         name: "FILE",
@@ -43,7 +63,8 @@ const completionSpec: Fig.Spec = {
     },
     {
       name: ["-r", "--require"],
-      insertValue: "--require=",
+
+      requiresSeparator: true,
       description: "Require MODULE before executing rakefile",
       args: {
         name: "MODULE",

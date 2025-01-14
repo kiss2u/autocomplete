@@ -1,9 +1,67 @@
 const knownHostRegex = /(?:[a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+/; // will match numerical IPs as well as domains/subdomains
 
-const knownHosts: Fig.Generator = {
-  script: "cat ~/.ssh/known_hosts",
-  postProcess: function (out, tokens) {
-    return out
+const resolveAbsolutePath = (
+  path: string,
+  basePath: string,
+  home: string
+): string => {
+  if (path.startsWith("/") || path.startsWith("~/") || path === "~") {
+    return path.replace("~", home);
+  }
+  if (
+    basePath.startsWith("/") ||
+    basePath.startsWith("~/") ||
+    basePath === "~"
+  ) {
+    return (
+      basePath.replace("~", home) +
+      (basePath.replace("~", home).endsWith("/") ? "" : "/") +
+      path
+    );
+  }
+  return basePath + (basePath.endsWith("/") ? "" : "/") + path;
+};
+
+const getConfigLines = async (
+  file: string,
+  executeShellCommand: Fig.ExecuteCommandFunction,
+  home: string,
+  basePath: string
+) => {
+  const absolutePath = resolveAbsolutePath(file, basePath, home);
+
+  const { stdout } = await executeShellCommand({
+    command: "cat",
+    // eslint-disable-next-line @withfig/fig-linter/no-useless-arrays
+    args: [absolutePath],
+  });
+  const configLines = stdout.split("\n").map((line) => line.trim());
+
+  // Get list of includes in the config file
+  const includes = configLines
+    .filter((line) => line.toLowerCase().startsWith("include "))
+    .map((line) => line.split(" ")[1]);
+
+  // Get the lines of every include file
+  const includeLines = await Promise.all(
+    includes.map((file) =>
+      getConfigLines(file, executeShellCommand, home, basePath)
+    )
+  );
+
+  // Combine config lines with includes config lines
+  return [...configLines, ...includeLines.flat()];
+};
+
+export const knownHosts: Fig.Generator = {
+  custom: async (tokens, executeCommand, context) => {
+    const { stdout } = await executeCommand({
+      command: "cat",
+      // eslint-disable-next-line @withfig/fig-linter/no-useless-arrays
+      args: [`${context.environmentVariables["HOME"]}/.ssh/known_hosts`],
+    });
+
+    return stdout
       .split("\n")
       .map((line) => {
         const match = knownHostRegex.exec(line);
@@ -20,31 +78,35 @@ const knownHosts: Fig.Generator = {
   trigger: "@",
 };
 
+export const configHosts: Fig.Generator = {
+  custom: async (tokens, executeShellCommand, context) => {
+    const configLines = await getConfigLines(
+      "config",
+      executeShellCommand,
+      context.environmentVariables["HOME"],
+      "~/.ssh"
+    );
+
+    return configLines
+      .filter(
+        (line) =>
+          line.trim().toLowerCase().startsWith("host ") && !line.includes("*")
+      )
+      .map((host) => ({
+        name: host.split(" ")[1],
+        description: "SSH host",
+        priority: 90,
+      }));
+  },
+};
+
 const completionSpec: Fig.Spec = {
   name: "ssh",
   description: "Log into a remote machine",
   args: {
     name: "user@hostname",
     description: "Address of remote machine to log into",
-    generators: [
-      {
-        script: "cat ~/.ssh/config",
-        postProcess: function (out) {
-          return out
-            .split("\n")
-            .filter(
-              (line) => line.trim().startsWith("Host ") && !line.includes("*")
-            )
-            .map((host) => ({
-              name: host.split(" ")[1],
-              description: "SSH host",
-              priority: 90,
-            }));
-        },
-      },
-      knownHosts,
-      { template: "history" },
-    ],
+    generators: [knownHosts, configHosts, { template: "history" }],
   },
   options: [
     {
